@@ -93,6 +93,8 @@
 
 #define FEATURE_TIME                     true
 #define FEATURE_SSDP                     true
+#define FEATURE_API                      true
+#define FEATURE_HTML                     true
 // ********************************************************************************
 //   DO NOT CHANGE ANYTHING BELOW THIS LINE
 // ********************************************************************************
