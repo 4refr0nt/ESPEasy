@@ -384,6 +384,8 @@ void handle_api_device() {
     return;
   }
 
+  if ( WebServer.method() == HTTP_POST ) device_save();  // shared with WEB HTML
+
   struct EventStruct TempEvent;
   byte index = taskindex.toInt();
 

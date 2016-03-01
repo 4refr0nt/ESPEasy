@@ -449,6 +449,8 @@ void handle_config() {
 void handle_hardware() {
   if (!isLoggedIn()) return;
 
+  save_hardware();
+
   String reply = "";
   addHeader(true, reply);
 
