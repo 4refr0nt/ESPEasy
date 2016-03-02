@@ -129,6 +129,7 @@ void save_hardware() {
 // Save data - advanced
 //********************************************************************************
 void save_advanced() {
+
   char tmpString[81];
 
   String mqttsubscribe = WebServer.arg("mqttsubscribe");
