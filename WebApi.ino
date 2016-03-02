@@ -50,13 +50,22 @@ void handle_api() {
     return;
   }
 
+  // debug
+  if ( WebServer.method() == HTTP_POST ) {
+    Serial.println("POST");
+    for (byte x = 0; x < WebServer.args(); x++) {
+      Serial.print(WebServer.argName(x));
+      Serial.print(F(" : "));
+      Serial.println(WebServer.arg(x));
+    }
+  }
+
   byte query;
 
   if ( WebServer.hasArg("q") ) {
     query = WebServer.arg("q").toInt();
   } else {
-    WebServer.send(500);
-    return;
+    query = 0;
   }
 
   switch ( query ) {
@@ -648,32 +657,34 @@ void handle_api_advanced() {
 
   String reply = "{";
 
-  reply +=       json_string(F("MQTTsubscribe"), String(Settings.MQTTsubscribe));
-  reply = reply + F(",") + json_string(F("MQTTpublish"  ), String(Settings.MQTTpublish));
-  reply = reply + F(",") + json_string(F("MessageDelay" ), String(Settings.MessageDelay));
-  reply = reply + F(",") + json_string(F("IP_Octet"     ), String(Settings.IP_Octet));
+  reply = reply +          json_string(F("mqttsubscribe"), String(Settings.MQTTsubscribe));
+  reply = reply + F(",") + json_string(F("mqttpublish"  ), String(Settings.MQTTpublish));
+  reply = reply + F(",") + json_string(F("messagedelay" ), String(Settings.MessageDelay));
+  reply = reply + F(",") + json_string(F("ip"           ), String(Settings.IP_Octet));
 
 #if FEATURE_TIME
-  reply = reply + F(",") + json_string(F("UseNTP"   ), String(Settings.UseNTP));
-  reply = reply + F(",") + json_string(F("NTPHost"  ), String(Settings.NTPHost));
-  reply = reply + F(",") + json_string(F("TimeZone" ), String(Settings.TimeZone));
-  reply = reply + F(",") + json_string(F("DST"      ), String(Settings.DST));
+  reply = reply + F(",") + json_string(F("usentp"   ), String(Settings.UseNTP));
+  reply = reply + F(",") + json_string(F("ntphost"  ), String(Settings.NTPHost));
+  reply = reply + F(",") + json_string(F("timezone" ), String(Settings.TimeZone));
+  reply = reply + F(",") + json_string(F("dst"      ), String(Settings.DST));
 #endif // FEATURE_TIME
 
   char str[20];
   str[0] = 0;
   sprintf_P(str, PSTR("%u.%u.%u.%u"), Settings.Syslog_IP[0], Settings.Syslog_IP[1], Settings.Syslog_IP[2], Settings.Syslog_IP[3]);
 
-  reply = reply + F(",") + json_string(F("Syslog_IP"      ), String(str));
-  reply = reply + F(",") + json_string(F("SyslogLevel"    ), String(Settings.SyslogLevel));
-  reply = reply + F(",") + json_string(F("UDPPort"        ), String(Settings.UDPPort));
-  reply = reply + F(",") + json_string(F("SerialLogLevel" ), String(Settings.SerialLogLevel));
-  reply = reply + F(",") + json_string(F("WebLogLevel"    ), String(Settings.WebLogLevel));
-  reply = reply + F(",") + json_string(F("BaudRate"       ), String(Settings.BaudRate));
-  reply = reply + F(",") + json_string(F("WDI2CAddress"   ), String(Settings.WDI2CAddress));
+  reply = reply + F(",") + json_string(F("syslogip"       ), String(str));
+  reply = reply + F(",") + json_string(F("sysloglevel"    ), String(Settings.SyslogLevel));
+  reply = reply + F(",") + json_string(F("udpport"        ), String(Settings.UDPPort));
+  reply = reply + F(",") + json_string(F("useserial"      ), String(Settings.UseSerial));
+  reply = reply + F(",") + json_string(F("serialloglevel" ), String(Settings.SerialLogLevel));
+  reply = reply + F(",") + json_string(F("webloglevel"    ), String(Settings.WebLogLevel));
+  reply = reply + F(",") + json_string(F("baudrate"       ), String(Settings.BaudRate));
+  reply = reply + F(",") + json_string(F("wdi2caddress"   ), String(Settings.WDI2CAddress));
+  reply = reply + F(",") + json_string(F("usessdp"        ), String(Settings.UseSSDP));
 
   #if !FEATURE_SPIFFS
-    reply = reply + F(",") + json_string(F("CustomCSS"), String(Settings.CustomCSS));
+    reply = reply + F(",") + json_string(F("customcss"), String(Settings.CustomCSS));
   #endif // !FEATURE_SPIFFS
 
   reply = reply + F("}");

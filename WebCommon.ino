@@ -87,6 +87,7 @@ void save_config() {
     espdns.toCharArray(tmpString, 26);
     str2ip(tmpString, Settings.DNS);
     Settings.Unit = unit.toInt();
+
     SaveSettings();
   }
 
@@ -178,6 +179,7 @@ void save_advanced() {
     Settings.DST = (dst == "on");
     Settings.WDI2CAddress = wdi2caddress.toInt();
     Settings.UseSSDP = (usessdp == "on");
+
     SaveSettings();
   }
 } // save_advanced
@@ -299,6 +301,7 @@ void device_save() {
       PluginCall(PLUGIN_INIT, &TempEvent, dummyString);
     }
     SaveTaskSettings(index - 1);
+
     SaveSettings();
   }
 } // device_save
