@@ -45,7 +45,10 @@ void handle_api() {
 
   if (!isLoggedInApi()) return;
 
-  if ( WebServer.method() == HTTP_OPTIONS ) handle_api_options(); // CORS
+  if ( WebServer.method() == HTTP_OPTIONS ) {
+    handle_api_options(); // CORS
+    return;
+  }
 
   byte query;
 
@@ -88,13 +91,11 @@ void handle_api() {
             handle_api_cmd();
             break;
     case 10: // protocols [get]
-             handle_api_protocols();
-             break;
+            handle_api_protocols();
+            break;
     default:
          WebServer.send(500);
-         return;
     }
-
 }
 //********************************************************************************
 // API [OPTIONS]
@@ -102,8 +103,18 @@ void handle_api() {
 // @return null
 //********************************************************************************
 void handle_api_options() {
-     WebServer.sendContent(F("HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: POST, GET, OPTIONS\r\nAccess-Control-Allow-Headers: Content-Type, X-Requested-With\r\nAccess-Control-Max-Age: 2048\r\nVary: Accept-Encoding, Origin\r\nContent-Encoding: gzip\r\nContent-Length: 0\r\nKeep-Alive: timeout=2, max=100\r\nConnection: Keep-Alive\r\nContent-Type: text/plain\r\n"));
+
+     String reply = "";
+
+     WebServer.sendHeader(F("Connection"), F("close"));
+     WebServer.sendHeader(F("Access-Control-Allow-Origin") , F("*"));
+     WebServer.sendHeader(F("Access-Control-Allow-Methods"), F("POST, GET, OPTIONS"));
+     WebServer.sendHeader(F("Access-Control-Allow-Headers"), F("Content-Type, X-Requested-With"));
+
+     WebServer.send(200, "application/json", reply);
+
 } // handle_api_options
+
 
 //********************************************************************************
 // Web Interface Wifi scanner
@@ -451,16 +462,13 @@ void handle_api_device() {
 // API [GET] root
 // @return [json]
 //********************************************************************************
-String handle_api_root() {
-  char tmp_buff[80]; // tmp buffer
+void handle_api_root() {
+
   String reply = F("{");
-  String comma;
 
-  reply += json_string( F("Name"), Settings.Name );
+  reply = reply + json_string( F("Name"), String(Settings.Name) );
 
-  int freeMem = ESP.getFreeHeap();
-
-  reply = reply + F(",") + json_number( F("FreeMem"), String( freeMem ) );
+  reply = reply + F(",") + json_string( F("FreeMem"), String( ESP.getFreeHeap() ) );
 
 #if FEATURE_TIME
   if (Settings.UseNTP) {
@@ -473,7 +481,9 @@ String handle_api_root() {
   }
 #endif
 
-  reply = reply + F(",") + json_number( F("Uptime"), String(wdcounter / 2) );
+  reply = reply + F(",") + json_string( F("Uptime"), String(wdcounter / 2) );
+
+  char tmp_buff[80]; // tmp buffer
   IPAddress ip = WiFi.localIP();
   sprintf_P(tmp_buff, PSTR("%u.%u.%u.%u"), ip[0], ip[1], ip[2], ip[3]);
   reply = reply + F(",") + json_string( F("IP"), String(tmp_buff) );
@@ -481,44 +491,40 @@ String handle_api_root() {
   IPAddress gw = WiFi.gatewayIP();
   sprintf_P(tmp_buff, PSTR("%u.%u.%u.%u"), gw[0], gw[1], gw[2], gw[3]);
   reply = reply + F(",") + json_string( F("Gateway"), String(tmp_buff) );
+
   reply = reply + F(",") + json_string( F("Build"), String(BUILD));
   reply = reply + F(",") + json_string( F("Unit"), String(Settings.Unit));
-
-
-
   uint8_t mac[] = {0, 0, 0, 0, 0, 0};
   uint8_t* macread = WiFi.macAddress(mac);
   sprintf_P(tmp_buff, PSTR("%02x:%02x:%02x:%02x:%02x:%02x"), macread[0], macread[1], macread[2], macread[3], macread[4], macread[5]);
   reply = reply + F(",") + json_string( F("STA_MAC"), String(tmp_buff) );
+
   macread = WiFi.softAPmacAddress(mac);
   sprintf_P(tmp_buff, PSTR("%02x:%02x:%02x:%02x:%02x:%02x"), macread[0], macread[1], macread[2], macread[3], macread[4], macread[5]);
   reply = reply + F(",") + json_string( F("AP_MAC"), String(tmp_buff));
+
   reply = reply + F(",") + json_string( F("Chip_id"), String(ESP.getChipId()));
   reply = reply + F(",") + json_string( F("Flash_Chip_id"), String(ESP.getFlashChipId()));
-  reply = reply + F(",") + json_string( F("Flash_Size"), String(ESP.getFlashChipRealSize()));
-
-  reply = reply + F(",") + json_number( F("Boot_cause"), String(lastBootCause) ) + F(",");
+  reply = reply + F(",") + json_string( F("Flash_Size"), String(ESP.getFlashChipRealSize()/1024));
+  reply = reply + F(",") + json_string( F("Boot_cause"), String(lastBootCause) ) + F(",");
   reply = reply + F("\"NodeList\":[");
-  // return reply;
-  comma  = F("{");
+
+  String comma  = F("{");
   for (byte x = 0; x < UNIT_MAX; x++)  {
     if (Nodes[x].ip[0] != 0)    {
-      sprintf_P(tmp_buff, PSTR("<a href='http://%u.%u.%u.%u'>%u.%u.%u.%u</a>"), Nodes[x].ip[0], Nodes[x].ip[1], Nodes[x].ip[2], Nodes[x].ip[3], Nodes[x].ip[0], Nodes[x].ip[1], Nodes[x].ip[2], Nodes[x].ip[3]);
-      reply += comma;
-      reply = reply + F("\"Unit\":\"");
-      reply += x;
-      reply = reply + F("\",\"Url\":\"");
-      reply += tmp_buff;
-      reply = reply + F("\",\"Age\":\"");
-      reply += Nodes[x].age;
+      sprintf_P(tmp_buff, PSTR("%u.%u.%u.%u"), Nodes[x].ip[0], Nodes[x].ip[1], Nodes[x].ip[2], Nodes[x].ip[3]);
+      reply = reply + comma;
+      reply = reply + json_string( F("Unit"), String(x) );
+      reply = reply + F(",") + json_string( F("Url"), String(tmp_buff) );
+      reply = reply + F(",") + json_string( F("Age"), String(Nodes[x].age) );
       reply = reply + F("\"}");
       comma  = F(",{");
     }
   }
 
-  // close json
   reply = reply + F("]}");
-  WebServer.send(200, "application/json", reply);
+
+  WebServer.send(200, "application/json", reply );
 } // handle_api_root
 
 //*****************************************************************************
