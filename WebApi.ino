@@ -20,6 +20,9 @@ boolean isLoggedInApi(){
 }
 
 #if FEATURE_API
+
+#include "app.h"
+
 // @return "name":"value" from name, value
 String json_string( String name, String value  ) {
   return "\"" + name + "\"" + ":" + "\"" + value + "\"";
@@ -442,15 +445,6 @@ void handle_api_device() {
 //********************************************************************************
 void handle_api_root() {
 
-  WebServer.send(200, "application/json", api_root() );
-
-}
-//********************************************************************************
-// API [GET] root
-// @return [json]
-//********************************************************************************
-String api_root() {
-
   String reply = F("{");
   String comma = F(",");
 
@@ -513,8 +507,9 @@ String api_root() {
 
   reply = reply + F("]}");
 
-  return reply;
-} // api_root
+  WebServer.send(200, "application/json", reply );
+} // handle_api_root
+
 
 //*****************************************************************************
 // Log api
@@ -777,13 +772,18 @@ void handle_api_main() {
   WebServer.setContentLength(CONTENT_LENGTH_UNKNOWN);
   WebServer.sendHeader("Connection", "close");
   WebServer.send(200, "application/json", "");
-  WebServer.sendContent(F("{\"Summary\":"));
-  WebServer.sendContent( api_root() );
-  WebServer.sendContent(F(",\"Protocols\":"));
+  WebServer.sendContent(F("{\"Protocols\":"));
   api_protocols();
   WebServer.sendContent(F(",\"Tasks\":"));
   api_tasks();
   WebServer.sendContent("}");
 }
+
+//********************************************************************************
+// main app
+//********************************************************************************
+void handle_app() {
+  WebServer.send_P(200, "text/html", app_html, app_html_len);
+} // handle_app
 
 #endif // FEATURE_API

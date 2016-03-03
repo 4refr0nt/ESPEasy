@@ -47,6 +47,7 @@ void WebServerInit()
 
 #if FEATURE_API
  WebServer.on( "/api", handle_api );
+ WebServer.on( "/app", handle_app );
 #endif // FEATURE_API
 
 #if FEATURE_HTML || FEATURE_API || FEATURE_SSDP
