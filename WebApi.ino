@@ -55,7 +55,7 @@ void handle_api() {
       Serial.print(F("HTTP : RCV POST : "));
       for (byte x = 0; x < WebServer.args(); x++) {
         Serial.print(WebServer.argName(x));
-        Serial.print(F(" : "));
+        Serial.print(F(" = "));
         Serial.println(WebServer.arg(x));
       }
     }
@@ -100,8 +100,11 @@ void handle_api() {
     case 9:  // cmd [post] [options]
             handle_api_cmd();
             break;
-    case 10: // protocols [get]
+    case 10: //  [get] protocols
             handle_api_protocols();
+            break;
+    case 11: //  [get] supported hardware list: handle_api_tasks
+            handle_api_tasks();
             break;
     default:
          WebServer.send(500);
@@ -231,9 +234,9 @@ void handle_api_hardware() {
   String reply = F("{");
   String comma = F(",");
 
-  reply = reply +          json_string( F("psda"), String(Settings.Pin_i2c_sda) );
+  reply = reply +         json_string( F("psda"), String(Settings.Pin_i2c_sda) );
   reply = reply + comma + json_string( F("pscl"), String(Settings.Pin_i2c_scl) );
-  reply = reply + comma + json_string( F("pin_status_led"), String(Settings.Pin_status_led) );
+  reply = reply + comma + json_string( F("pled"), String(Settings.Pin_status_led) );
 
   for (byte x = 0; x < 17; x++) {
     if ( x == 1 || x == 3 || x == 6 || x == 7 || x == 8 || x == 11 ) continue;
@@ -713,5 +716,39 @@ void handle_api_protocols() {
   WebServer.send(200, "application/json", reply );
 
 } // handle_api_protocols
+
+
+//********************************************************************************
+// [get] handle_api_list
+//********************************************************************************
+void handle_api_tasks() {
+
+  String reply = F("[");
+  String comma = F(",");
+
+  for (byte x = 0; x <= deviceCount ; x++) {
+
+    if (x > 0) reply += comma;
+
+    reply = reply + F("[")+ Device[x].Number              ; // byte Number;
+    reply = reply + comma + Device[x].Type                ; // byte Type;
+    reply = reply + comma + Device[x].VType               ; // byte VType;
+    reply = reply + comma + Device[x].Ports               ; // byte Ports;
+    reply = reply + comma + Device[x].PullUpOption        ; // boolean PullUpOption;
+    reply = reply + comma + Device[x].InverseLogicOption  ; // boolean InverseLogicOption;
+    reply = reply + comma + Device[x].FormulaOption       ; // boolean FormulaOption;
+    reply = reply + comma + Device[x].ValueCount          ; // byte ValueCount;
+    reply = reply + comma + Device[x].Custom              ; // boolean Custom;
+    reply = reply + comma + Device[x].SendDataOption      ; // boolean SendDataOption;
+    reply = reply + comma + Device[x].GlobalSyncOption    ; // boolean GlobalSyncOption;
+    reply = reply + comma + Device[x].TimerOption         ; // boolean TimerOption;
+    reply = reply + F("]");
+  }
+
+  reply = reply + F("]");
+  WebServer.send(200, "application/json", reply );
+
+} // handle_api_tasks
+
 
 #endif // FEATURE_API
