@@ -33,11 +33,11 @@ String json_number(  String name, String value) {
 String json_number(  String name, int value) {
   return "\"" + name + "\"" + ":" +  value;
 }
-*/
 // @return "name":[values] from name, values
 String json_array(  String name, String values)  {
   return "\"" + name + "\"" + ":[" + values + "]";
 }
+*/
 //********************************************************************************
 // API main handler
 //********************************************************************************
@@ -66,12 +66,13 @@ void handle_api() {
   if ( WebServer.hasArg("q") ) {
     query = WebServer.arg("q").toInt();
   } else {
-    query = 0;
+    handle_api_main();
+    return;
   }
 
   switch ( query ) {
     case 0: // root [get]
-            summary();
+            handle_api_root();
             break;
     case 1: // config [get] [post] [options]
             handle_api_config();
@@ -99,12 +100,6 @@ void handle_api() {
             break;
     case 9:  // cmd [post] [options]
             handle_api_cmd();
-            break;
-    case 10: //  [get] protocols
-            handle_api_protocols();
-            break;
-    case 11: //  [get] supported hardware list: handle_api_tasks
-            handle_api_tasks();
             break;
     default:
          WebServer.send(500);
@@ -167,61 +162,61 @@ void handle_api_config() {
 
   String reply = F("{");
   String comma = F(",");
+  char tmp_buff[80];
 
-  reply += json_string( F("name"), Settings.Name) +
-           comma + json_string( F("usedns"), String(Settings.UseDNS) ) +
-           comma + json_string( F("unit"), String(Settings.Unit) ) +
-           comma + json_string( F("protocol"), String(Settings.Protocol)) +
-           comma + json_array( F("controllerip"),
-                              String(Settings.Controller_IP[0]) + comma +
-                              String(Settings.Controller_IP[1]) + comma +
-                              String(Settings.Controller_IP[2]) + comma +
-                              String(Settings.Controller_IP[3])
-                            ) +
-           comma + json_array( F("espip"),
-                              String(Settings.IP[0]) + comma +
-                              String(Settings.IP[1]) + comma +
-                              String(Settings.IP[2]) + comma +
-                              String(Settings.IP[3])
-                            ) +
-           comma + json_array( F("espsubnet"),
-                              String(Settings.Subnet[0]) + comma +
-                              String(Settings.Subnet[1]) + comma +
-                              String(Settings.Subnet[2]) + comma +
-                              String(Settings.Subnet[3])
-                            ) +
-           comma + json_array( F("espdns"),
-                              String(Settings.DNS[0]) + comma +
-                              String(Settings.DNS[1]) + comma +
-                              String(Settings.DNS[2]) + comma +
-                              String(Settings.DNS[3])
-                            ) +
-           comma + json_array( F("espgateway"),
-                              String(Settings.Gateway[0]) + comma +
-                              String(Settings.Gateway[1]) + comma +
-                              String(Settings.Gateway[2]) + comma +
-                              String(Settings.Gateway[3])
-                            ) +
-           comma + json_string( F("controllerhostname"), Settings.ControllerHostName) +
-           comma + json_string( F("delay"), String(Settings.Delay)) +
-           comma + json_string( F("deepsleep"), String(Settings.deepSleep)) +
-           comma + json_string( F("controllerport"), String( Settings.ControllerPort) )
-           ;
+  reply +=         json_string( F("name"), Settings.Name);
+  reply += comma + json_string( F("usedns"), String(Settings.UseDNS) );
+  reply += comma + json_string( F("unit"), String(Settings.Unit) );
+  reply += comma + json_string( F("protocol"), String(Settings.Protocol));
 
-  // SecuritySettings
-  reply = reply + comma + json_string( F("ssid"), SecuritySettings.WifiSSID) +
-                  comma + json_string( F("key"), SecuritySettings.WifiKey) +
-                  comma + json_string( F("apkey"), SecuritySettings.WifiAPKey) +
-                  comma + json_string( F("controllerpassword"), SecuritySettings.ControllerPassword) +
-                  comma + json_string( F("controlleruser"), SecuritySettings.ControllerUser);
+  sprintf_P(tmp_buff, PSTR("%u.%u.%u.%u"), Settings.Controller_IP[0],
+                                           Settings.Controller_IP[1],
+                                           Settings.Controller_IP[2],
+                                           Settings.Controller_IP[3]);
+  reply = reply + comma + json_string( F("controllerip"), String(tmp_buff) );
 
-  // close json
+
+  sprintf_P(tmp_buff, PSTR("%u.%u.%u.%u"), Settings.IP[0],
+                                           Settings.IP[1],
+                                           Settings.IP[2],
+                                           Settings.IP[3]);
+  reply = reply + comma + json_string( F("espip"), String(tmp_buff) );
+
+  sprintf_P(tmp_buff, PSTR("%u.%u.%u.%u"), Settings.Gateway[0],
+                                           Settings.Gateway[1],
+                                           Settings.Gateway[2],
+                                           Settings.Gateway[3]);
+  reply = reply + comma + json_string( F("espgateway"), String(tmp_buff) );
+
+  sprintf_P(tmp_buff, PSTR("%u.%u.%u.%u"), Settings.Subnet[0],
+                                           Settings.Subnet[1],
+                                           Settings.Subnet[2],
+                                           Settings.Subnet[3]);
+  reply = reply + comma + json_string( F("espsubnet"), String(tmp_buff) );
+
+  sprintf_P(tmp_buff, PSTR("%u.%u.%u.%u"), Settings.DNS[0],
+                                           Settings.DNS[1],
+                                           Settings.DNS[2],
+                                           Settings.DNS[3]);
+  reply = reply + comma + json_string( F("espdns"), String(tmp_buff) );
+
+  reply = reply + comma + json_string( F("controllerhostname"), String(Settings.ControllerHostName));
+  reply = reply + comma + json_string( F("delay"), String(Settings.Delay));
+  reply = reply + comma + json_string( F("deepsleep"), String(Settings.deepSleep));
+  reply = reply + comma + json_string( F("controllerport"), String( Settings.ControllerPort) );
+
+  reply = reply + comma + json_string( F("ssid"), String( SecuritySettings.WifiSSID)) +
+                  comma + json_string( F("key"), String( SecuritySettings.WifiKey)) +
+                  comma + json_string( F("apkey"), String( SecuritySettings.WifiAPKey)) +
+                  comma + json_string( F("controllerpassword"), String( SecuritySettings.ControllerPassword)) +
+                  comma + json_string( F("controlleruser"), String( SecuritySettings.ControllerUser));
+
   reply = reply + F("}");
 
-  // debug
   WebServer.send(200, "application/json", reply);
 
 } // handle_api_config
+
 
 //********************************************************************************
 // api [GET] hardware json
@@ -445,7 +440,16 @@ void handle_api_device() {
 // API [GET] root
 // @return [json]
 //********************************************************************************
-String handle_api_root() {
+void handle_api_root() {
+
+  WebServer.send(200, "application/json", api_root() );
+
+}
+//********************************************************************************
+// API [GET] root
+// @return [json]
+//********************************************************************************
+String api_root() {
 
   String reply = F("{");
   String comma = F(",");
@@ -509,9 +513,8 @@ String handle_api_root() {
 
   reply = reply + F("]}");
 
-//  WebServer.send(200, "application/json", reply );
   return reply;
-} // handle_api_root
+} // api_root
 
 //*****************************************************************************
 // Log api
@@ -693,7 +696,7 @@ void handle_api_advanced() {
 //********************************************************************************
 // [get] handle_api_protocols
 //********************************************************************************
-String handle_api_protocols() {
+void api_protocols() {
 
   String reply = F("[");
   String comma = F(",");
@@ -714,19 +717,20 @@ String handle_api_protocols() {
     reply = reply + comma + json_string(F("Password"   ), String(Protocol[x].usesPassword) );
     reply = reply + comma + json_string(F("defaultPort"), String(Protocol[x].defaultPort ) );
     reply = reply + F("}");
+    WebServer.sendContent(reply);
+    reply = "";
   }
 
   reply = reply + F("]");
-//  WebServer.send(200, "application/json", reply );
-  return reply;
+  WebServer.sendContent(reply);
 
-} // handle_api_protocols
+} // api_protocols
 
 
 //********************************************************************************
-// [get] handle_api_list
+// [get] api_tasks
 //********************************************************************************
-String handle_api_tasks() {
+void api_tasks() {
 
   struct EventStruct TempEvent;
   String reply = F("[");
@@ -754,28 +758,31 @@ String handle_api_tasks() {
     reply = reply + comma + Device[x].TimerOption        ; // boolean TimerOption;
     reply = reply + comma + "\"" + deviceName + "\""     ; // boolean TimerOption;
     reply = reply + F("]");
+    WebServer.sendContent(reply);
+    reply = "";
   }
 
   reply = reply + F("]");
-  // WebServer.send(200, "application/json", reply );
-  return reply;
 
-} // handle_api_tasks
+  WebServer.sendContent(reply);
+
+} // api_tasks
 
 
 //********************************************************************************
 // API [GET]
 // @return 3 x [json]
 //********************************************************************************
-void summary() {
+void handle_api_main() {
   WebServer.setContentLength(CONTENT_LENGTH_UNKNOWN);
+  WebServer.sendHeader("Connection", "close");
   WebServer.send(200, "application/json", "");
-  WebServer.sendContent("{\"Summary\":");
-  WebServer.sendContent( handle_api_root() );
-  WebServer.sendContent(",\"Protocols\":");
-  WebServer.sendContent( handle_api_protocols() );
-  WebServer.sendContent(",\"Tasks\":");
-  WebServer.sendContent( handle_api_tasks() );
+  WebServer.sendContent(F("{\"Summary\":"));
+  WebServer.sendContent( api_root() );
+  WebServer.sendContent(F(",\"Protocols\":"));
+  api_protocols();
+  WebServer.sendContent(F(",\"Tasks\":"));
+  api_tasks();
   WebServer.sendContent("}");
 }
 
