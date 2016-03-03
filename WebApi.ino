@@ -71,7 +71,7 @@ void handle_api() {
 
   switch ( query ) {
     case 0: // root [get]
-            handle_api_root();
+            summary();
             break;
     case 1: // config [get] [post] [options]
             handle_api_config();
@@ -445,7 +445,7 @@ void handle_api_device() {
 // API [GET] root
 // @return [json]
 //********************************************************************************
-void handle_api_root() {
+String handle_api_root() {
 
   String reply = F("{");
   String comma = F(",");
@@ -509,7 +509,8 @@ void handle_api_root() {
 
   reply = reply + F("]}");
 
-  WebServer.send(200, "application/json", reply );
+//  WebServer.send(200, "application/json", reply );
+  return reply;
 } // handle_api_root
 
 //*****************************************************************************
@@ -692,7 +693,7 @@ void handle_api_advanced() {
 //********************************************************************************
 // [get] handle_api_protocols
 //********************************************************************************
-void handle_api_protocols() {
+String handle_api_protocols() {
 
   String reply = F("[");
   String comma = F(",");
@@ -703,8 +704,11 @@ void handle_api_protocols() {
     } else {
       reply = reply + F("{");
     }
-    reply = reply          + json_string(F("Number"     ), String(Protocol[x].Number      ) );
-//    reply = reply + comma + json_string(F("Name"       ), String(Protocol[x].Name        ) );
+    String ProtocolName = "";
+    CPlugin_ptr[x](CPLUGIN_GET_DEVICENAME, 0, ProtocolName);
+
+    reply = reply         + json_string(F("Number"     ), String(Protocol[x].Number      ) );
+    reply = reply + comma + json_string(F("Name"       ), String(ProtocolName            ) );
     reply = reply + comma + json_string(F("MQTT"       ), String(Protocol[x].usesMQTT    ) );
     reply = reply + comma + json_string(F("Account"    ), String(Protocol[x].usesAccount ) );
     reply = reply + comma + json_string(F("Password"   ), String(Protocol[x].usesPassword) );
@@ -713,7 +717,8 @@ void handle_api_protocols() {
   }
 
   reply = reply + F("]");
-  WebServer.send(200, "application/json", reply );
+//  WebServer.send(200, "application/json", reply );
+  return reply;
 
 } // handle_api_protocols
 
@@ -721,34 +726,57 @@ void handle_api_protocols() {
 //********************************************************************************
 // [get] handle_api_list
 //********************************************************************************
-void handle_api_tasks() {
+String handle_api_tasks() {
 
+  struct EventStruct TempEvent;
   String reply = F("[");
   String comma = F(",");
+  String deviceName;
 
   for (byte x = 0; x <= deviceCount ; x++) {
 
     if (x > 0) reply += comma;
 
-    reply = reply + F("[")+ Device[x].Number              ; // byte Number;
-    reply = reply + comma + Device[x].Type                ; // byte Type;
-    reply = reply + comma + Device[x].VType               ; // byte VType;
-    reply = reply + comma + Device[x].Ports               ; // byte Ports;
-    reply = reply + comma + Device[x].PullUpOption        ; // boolean PullUpOption;
-    reply = reply + comma + Device[x].InverseLogicOption  ; // boolean InverseLogicOption;
-    reply = reply + comma + Device[x].FormulaOption       ; // boolean FormulaOption;
-    reply = reply + comma + Device[x].ValueCount          ; // byte ValueCount;
-    reply = reply + comma + Device[x].Custom              ; // boolean Custom;
-    reply = reply + comma + Device[x].SendDataOption      ; // boolean SendDataOption;
-    reply = reply + comma + Device[x].GlobalSyncOption    ; // boolean GlobalSyncOption;
-    reply = reply + comma + Device[x].TimerOption         ; // boolean TimerOption;
+    deviceName = "";
+    Plugin_ptr[x](PLUGIN_GET_DEVICENAME, &TempEvent, deviceName);
+
+    reply = reply + F("[")+ Device[x].Number             ; // byte Number;
+    reply = reply + comma + Device[x].Type               ; // byte Type;
+    reply = reply + comma + Device[x].VType              ; // byte VType;
+    reply = reply + comma + Device[x].Ports              ; // byte Ports;
+    reply = reply + comma + Device[x].PullUpOption       ; // boolean PullUpOption;
+    reply = reply + comma + Device[x].InverseLogicOption ; // boolean InverseLogicOption;
+    reply = reply + comma + Device[x].FormulaOption      ; // boolean FormulaOption;
+    reply = reply + comma + Device[x].ValueCount         ; // byte ValueCount;
+    reply = reply + comma + Device[x].Custom             ; // boolean Custom;
+    reply = reply + comma + Device[x].SendDataOption     ; // boolean SendDataOption;
+    reply = reply + comma + Device[x].GlobalSyncOption   ; // boolean GlobalSyncOption;
+    reply = reply + comma + Device[x].TimerOption        ; // boolean TimerOption;
+    reply = reply + comma + "\"" + deviceName + "\""     ; // boolean TimerOption;
     reply = reply + F("]");
   }
 
   reply = reply + F("]");
-  WebServer.send(200, "application/json", reply );
+  // WebServer.send(200, "application/json", reply );
+  return reply;
 
 } // handle_api_tasks
 
+
+//********************************************************************************
+// API [GET]
+// @return 3 x [json]
+//********************************************************************************
+void summary() {
+  WebServer.setContentLength(CONTENT_LENGTH_UNKNOWN);
+  WebServer.send(200, "application/json", "");
+  WebServer.sendContent("{\"Summary\":");
+  WebServer.sendContent( handle_api_root() );
+  WebServer.sendContent(",\"Protocols\":");
+  WebServer.sendContent( handle_api_protocols() );
+  WebServer.sendContent(",\"Tasks\":");
+  WebServer.sendContent( handle_api_tasks() );
+  WebServer.sendContent("}");
+}
 
 #endif // FEATURE_API
