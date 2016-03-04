@@ -826,7 +826,7 @@ void handle_dev_temp() {
     if (ExtraTaskSettings.TaskDeviceValueNames[0][0] == 0)
       PluginCall(PLUGIN_GET_DEVICEVALUENAMES, &TempEvent, dummyString);
 
-      reply += F("{\"template\":\"<table><TH>Task Settings</TH><TH>Value</TH>");
+      reply += F("{\"template\":\"<table class='table'><TH>Task Settings</TH><TH>Value</TH>");
 
     //reply += F("<TR><TD>Device:<TD>");
     //addDeviceSelect(reply, "taskdevicenumber", Settings.TaskDeviceNumber[index - 1]);
@@ -948,7 +948,7 @@ void handle_dev_temp() {
 
     }
     reply += F("<TR><TD><TD>");
-    reply += F("<button class='btn btn-info pull-right btn-sm' value='Apply'>");
+    reply += F("<button class='btn btn-info pull-right btn-sm'>Apply</button>");
     reply += F("<input type='hidden' name='edit' value='1'>");
     reply += F("</table>\"}");
     WebServer.send(200, "application/json", reply );
