@@ -104,6 +104,9 @@ void handle_api() {
     case 9:  // cmd [post] [options]
             handle_api_cmd();
             break;
+    case 10:
+            handle_dev_temp();
+            break;
     default:
          WebServer.send(500);
     }
@@ -797,4 +800,157 @@ void handle_app() {
   WebServer.send_P(200, "text/html", app_html, app_html_len);
 } // handle_app
 
+//********************************************************************************
+// handle_dev_temp
+//********************************************************************************
+void handle_dev_temp() {
+
+  String taskindex;
+  if ( WebServer.hasArg("index") ) {
+    taskindex  = WebServer.arg("index");
+  } else {
+    WebServer.send(500);
+    return;
+  }
+
+  if ( WebServer.method() == HTTP_POST ) device_save();  // shared with WEB HTML
+
+  String reply="";
+  struct EventStruct TempEvent;
+  byte index = taskindex.toInt();
+  byte DeviceIndex = getDeviceIndex(Settings.TaskDeviceNumber[index - 1]);
+
+    LoadTaskSettings(index - 1);
+    TempEvent.TaskIndex = index - 1;
+
+    if (ExtraTaskSettings.TaskDeviceValueNames[0][0] == 0)
+      PluginCall(PLUGIN_GET_DEVICEVALUENAMES, &TempEvent, dummyString);
+
+    reply += F("{\"template\":\"<form name='frmselect' method='post'><table><TH>Task Settings<TH>Value");
+
+    reply += F("<TR><TD>Device:<TD>");
+    //addDeviceSelect(reply, "taskdevicenumber", Settings.TaskDeviceNumber[index - 1]);
+
+    if (Settings.TaskDeviceNumber[index - 1] != 0 )
+    {
+      reply += F("<a class='button-link' href='http://www.esp8266.nu/index.php/plugin");
+      reply += Settings.TaskDeviceNumber[index - 1];
+      reply += F("' target='_blank'>?</a>");
+
+      reply += F("<TR><TD>Name:<TD><input type='text' maxlength='25' name='taskdevicename' value='");
+      reply += ExtraTaskSettings.TaskDeviceName;
+      reply += F("'>");
+
+      if (Device[DeviceIndex].TimerOption)
+      {
+        reply += F("<TR><TD>Delay:<TD><input type='text' name='taskdevicetimer' value='");
+        reply += Settings.TaskDeviceTimer[index - 1];
+        reply += F("'>");
+      }
+
+      if (!Device[DeviceIndex].Custom)
+      {
+        reply += F("<TR><TD>IDX / Var:<TD><input type='text' name='taskdeviceid' value='");
+        reply += Settings.TaskDeviceID[index - 1];
+        reply += F("'>");
+      }
+
+      if (!Device[DeviceIndex].Custom && Settings.TaskDeviceDataFeed[index - 1] == 0)
+      {
+        if (Device[DeviceIndex].Ports != 0)
+        {
+          reply += F("<TR><TD>Port:<TD><input type='text' name='taskdeviceport' value='");
+          reply += Settings.TaskDevicePort[index - 1];
+          reply += F("'>");
+        }
+
+        if (Device[DeviceIndex].Type == DEVICE_TYPE_SINGLE || Device[DeviceIndex].Type == DEVICE_TYPE_DUAL)
+        {
+          reply += F("<TR><TD>1st GPIO:<TD>");
+          addPinSelect(false, reply, "taskdevicepin1", Settings.TaskDevicePin1[index - 1]);
+        }
+        if (Device[DeviceIndex].Type == DEVICE_TYPE_DUAL)
+        {
+          reply += F("<TR><TD>2nd GPIO:<TD>");
+          addPinSelect(false, reply, "taskdevicepin2", Settings.TaskDevicePin2[index - 1]);
+        }
+
+        if (Device[DeviceIndex].PullUpOption)
+        {
+          reply += F("<TR><TD>Pull UP:<TD>");
+          if (Settings.TaskDevicePin1PullUp[index - 1])
+            reply += F("<input type=checkbox name=taskdevicepin1pullup checked>");
+          else
+            reply += F("<input type=checkbox name=taskdevicepin1pullup>");
+        }
+
+        if (Device[DeviceIndex].InverseLogicOption)
+        {
+          reply += F("<TR><TD>Inversed:<TD>");
+          if (Settings.TaskDevicePin1Inversed[index - 1])
+            reply += F("<input type=checkbox name=taskdevicepin1inversed checked>");
+          else
+            reply += F("<input type=checkbox name=taskdevicepin1inversed>");
+        }
+      }
+
+      PluginCall(PLUGIN_WEBFORM_LOAD, &TempEvent, reply);
+
+      if (Device[DeviceIndex].SendDataOption)
+      {
+        reply += F("<TR><TD>Send Data:<TD>");
+        if (Settings.TaskDeviceSendData[index - 1])
+          reply += F("<input type=checkbox name=taskdevicesenddata checked>");
+        else
+          reply += F("<input type=checkbox name=taskdevicesenddata>");
+      }
+
+      if (Device[DeviceIndex].GlobalSyncOption && Settings.TaskDeviceDataFeed[index - 1] == 0 && Settings.UDPPort != 0)
+      {
+        reply += F("<TR><TD>Global Sync:<TD>");
+        if (Settings.TaskDeviceGlobalSync[index - 1])
+          reply += F("<input type=checkbox name=taskdeviceglobalsync checked>");
+        else
+          reply += F("<input type=checkbox name=taskdeviceglobalsync>");
+      }
+
+      if (!Device[DeviceIndex].Custom)
+      {
+        reply += F("<TR><TH>Optional Settings<TH>Value");
+
+        if (Device[DeviceIndex].FormulaOption)
+        {
+          for (byte varNr = 0; varNr < Device[DeviceIndex].ValueCount; varNr++)
+          {
+            reply += F("<TR><TD>Formula ");
+            reply += ExtraTaskSettings.TaskDeviceValueNames[varNr];
+            reply += F(":<TD><input type='text' maxlength='25' name='taskdeviceformula");
+            reply += varNr + 1;
+            reply += F("' value='");
+            reply += ExtraTaskSettings.TaskDeviceFormula[varNr];
+            reply += F("'>");
+            if (varNr == 0)
+              reply += F("<a class='button-link' href='http://www.esp8266.nu/index.php/EasyFormula' target='_blank'>?</a>");
+          }
+        }
+
+        for (byte varNr = 0; varNr < Device[DeviceIndex].ValueCount; varNr++)
+        {
+          reply += F("<TR><TD>Value Name ");
+          reply += varNr + 1;
+          reply += F(":<TD><input type='text' maxlength='25' name='taskdevicevaluename");
+          reply += varNr + 1;
+          reply += F("' value='");
+          reply += ExtraTaskSettings.TaskDeviceValueNames[varNr];
+          reply += F("'>");
+        }
+      }
+
+    }
+    reply += F("<TR><TD><TD>");
+    reply += F("<input type='submit' value='Submit'>");
+    reply += F("<input type='hidden' name='edit' value='1'>");
+    reply += F("</table></form>\"}");
+    WebServer.send(200, "application/json", reply );
+}
 #endif // FEATURE_API
