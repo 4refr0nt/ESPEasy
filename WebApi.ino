@@ -384,15 +384,16 @@ void handle_api_device() {
 
   struct EventStruct TempEvent;
   byte index = taskindex.toInt();
-
   index --;
+  byte DeviceIndex = getDeviceIndex(Settings.TaskDeviceNumber[index]);
+  TempEvent.TaskIndex = index;
+
   LoadTaskSettings(index);
 
   if (ExtraTaskSettings.TaskDeviceValueNames[0][0] == 0) {
     PluginCall(PLUGIN_GET_DEVICEVALUENAMES, &TempEvent, dummyString);
   }
 
-  byte DeviceIndex = getDeviceIndex(Settings.TaskDeviceNumber[index]);
 
   String deviceName = "";
   if (Settings.TaskDeviceNumber[index] != 0) {
@@ -431,6 +432,16 @@ void handle_api_device() {
       reply = reply + comma + json_string( arg , String( UserVar[index * VARS_PER_TASK + varNr]  ));
     }
   }
+
+  if (Device[DeviceIndex].TimerOption) {
+     reply = reply + comma + json_string( F("taskdevicetimer"), String( Settings.TaskDeviceTimer[index] ) );
+  }
+
+
+  String selectTemplate = "";
+  PluginCall(PLUGIN_WEBFORM_LOAD, &TempEvent, selectTemplate);
+
+  reply = reply + comma + json_string( F("template"), selectTemplate );
 
   reply = reply + F("}");
 
