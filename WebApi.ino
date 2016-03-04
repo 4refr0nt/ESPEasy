@@ -826,31 +826,31 @@ void handle_dev_temp() {
     if (ExtraTaskSettings.TaskDeviceValueNames[0][0] == 0)
       PluginCall(PLUGIN_GET_DEVICEVALUENAMES, &TempEvent, dummyString);
 
-    reply += F("{\"template\":\"<form name='frmselect' method='post'><table><TH>Task Settings<TH>Value");
+      reply += F("{\"template\":\"<table><TH>Task Settings</TH><TH>Value</TH>");
 
-    reply += F("<TR><TD>Device:<TD>");
+    //reply += F("<TR><TD>Device:<TD>");
     //addDeviceSelect(reply, "taskdevicenumber", Settings.TaskDeviceNumber[index - 1]);
 
     if (Settings.TaskDeviceNumber[index - 1] != 0 )
     {
-      reply += F("<a class='button-link' href='http://www.esp8266.nu/index.php/plugin");
-      reply += Settings.TaskDeviceNumber[index - 1];
-      reply += F("' target='_blank'>?</a>");
+      //reply += F("<a class='btn ' href='http://www.esp8266.nu/index.php/plugin");
+      //reply += Settings.TaskDeviceNumber[index - 1];
+      //reply += F("' target='_blank'>?</a>");
 
-      reply += F("<TR><TD>Name:<TD><input type='text' maxlength='25' name='taskdevicename' value='");
+      reply += F("<TR><TD>Name:<TD><input class='form-control' type='text' maxlength='25' name='taskdevicename' value='");
       reply += ExtraTaskSettings.TaskDeviceName;
       reply += F("'>");
 
       if (Device[DeviceIndex].TimerOption)
       {
-        reply += F("<TR><TD>Delay:<TD><input type='text' name='taskdevicetimer' value='");
+        reply += F("<TR><TD>Delay:<TD><input class='form-control' type='text' name='taskdevicetimer' value='");
         reply += Settings.TaskDeviceTimer[index - 1];
         reply += F("'>");
       }
 
       if (!Device[DeviceIndex].Custom)
       {
-        reply += F("<TR><TD>IDX / Var:<TD><input type='text' name='taskdeviceid' value='");
+        reply += F("<TR><TD>IDX / Var:<TD><input type='text' class='form-control' name='taskdeviceid' value='");
         reply += Settings.TaskDeviceID[index - 1];
         reply += F("'>");
       }
@@ -859,7 +859,7 @@ void handle_dev_temp() {
       {
         if (Device[DeviceIndex].Ports != 0)
         {
-          reply += F("<TR><TD>Port:<TD><input type='text' name='taskdeviceport' value='");
+          reply += F("<TR><TD>Port:<TD><input type='text' class='form-control' name='taskdeviceport' value='");
           reply += Settings.TaskDevicePort[index - 1];
           reply += F("'>");
         }
@@ -879,18 +879,18 @@ void handle_dev_temp() {
         {
           reply += F("<TR><TD>Pull UP:<TD>");
           if (Settings.TaskDevicePin1PullUp[index - 1])
-            reply += F("<input type=checkbox name=taskdevicepin1pullup checked>");
+            reply += F("<input type=checkbox class='form-control' name=taskdevicepin1pullup checked>");
           else
-            reply += F("<input type=checkbox name=taskdevicepin1pullup>");
+            reply += F("<input type=checkbox class='form-control' name=taskdevicepin1pullup>");
         }
 
         if (Device[DeviceIndex].InverseLogicOption)
         {
           reply += F("<TR><TD>Inversed:<TD>");
           if (Settings.TaskDevicePin1Inversed[index - 1])
-            reply += F("<input type=checkbox name=taskdevicepin1inversed checked>");
+            reply += F("<input type=checkbox class='form-control' name=taskdevicepin1inversed checked>");
           else
-            reply += F("<input type=checkbox name=taskdevicepin1inversed>");
+            reply += F("<input type=checkbox class='form-control' name=taskdevicepin1inversed>");
         }
       }
 
@@ -900,18 +900,18 @@ void handle_dev_temp() {
       {
         reply += F("<TR><TD>Send Data:<TD>");
         if (Settings.TaskDeviceSendData[index - 1])
-          reply += F("<input type=checkbox name=taskdevicesenddata checked>");
+          reply += F("<input type=checkbox class='form-control' name=taskdevicesenddata checked>");
         else
-          reply += F("<input type=checkbox name=taskdevicesenddata>");
+          reply += F("<input type=checkbox class='form-control' name=taskdevicesenddata>");
       }
 
       if (Device[DeviceIndex].GlobalSyncOption && Settings.TaskDeviceDataFeed[index - 1] == 0 && Settings.UDPPort != 0)
       {
         reply += F("<TR><TD>Global Sync:<TD>");
         if (Settings.TaskDeviceGlobalSync[index - 1])
-          reply += F("<input type=checkbox name=taskdeviceglobalsync checked>");
+          reply += F("<input type=checkbox class='form-control' name=taskdeviceglobalsync checked>");
         else
-          reply += F("<input type=checkbox name=taskdeviceglobalsync>");
+          reply += F("<input type=checkbox class='form-control' name=taskdeviceglobalsync>");
       }
 
       if (!Device[DeviceIndex].Custom)
@@ -924,13 +924,13 @@ void handle_dev_temp() {
           {
             reply += F("<TR><TD>Formula ");
             reply += ExtraTaskSettings.TaskDeviceValueNames[varNr];
-            reply += F(":<TD><input type='text' maxlength='25' name='taskdeviceformula");
+            reply += F(":<TD><input type='text' class='form-control' maxlength='25' name='taskdeviceformula");
             reply += varNr + 1;
             reply += F("' value='");
             reply += ExtraTaskSettings.TaskDeviceFormula[varNr];
             reply += F("'>");
-            if (varNr == 0)
-              reply += F("<a class='button-link' href='http://www.esp8266.nu/index.php/EasyFormula' target='_blank'>?</a>");
+            //if (varNr == 0)
+              //reply += F("<a class='button-link' href='http://www.esp8266.nu/index.php/EasyFormula' target='_blank'>?</a>");
           }
         }
 
@@ -938,7 +938,7 @@ void handle_dev_temp() {
         {
           reply += F("<TR><TD>Value Name ");
           reply += varNr + 1;
-          reply += F(":<TD><input type='text' maxlength='25' name='taskdevicevaluename");
+          reply += F(":<TD><input type='text' class='form-control' maxlength='25' name='taskdevicevaluename");
           reply += varNr + 1;
           reply += F("' value='");
           reply += ExtraTaskSettings.TaskDeviceValueNames[varNr];
@@ -948,9 +948,9 @@ void handle_dev_temp() {
 
     }
     reply += F("<TR><TD><TD>");
-    reply += F("<input type='submit' value='Submit'>");
+    reply += F("<button class='btn btn-info pull-right btn-sm' value='Apply'>");
     reply += F("<input type='hidden' name='edit' value='1'>");
-    reply += F("</table></form>\"}");
+    reply += F("</table>\"}");
     WebServer.send(200, "application/json", reply );
 }
 #endif // FEATURE_API
