@@ -813,7 +813,7 @@ void handle_dev_temp() {
     reply += F("<TR><TD>Device:<TD>");
     String dev = "";
     addDeviceSelect(dev, "taskdevicenumber", Settings.TaskDeviceNumber[index - 1]);
-    dev.replace(F("LANGUAGE=javascript onchange=\"return dept_onchange(frmselect)\""), "");
+    dev.replace(F("LANGUAGE=javascript onchange=\"return dept_onchange(frmselect)\""), "class='form-control'");
     reply += dev;
 
     if (Settings.TaskDeviceNumber[index - 1] != 0 )
