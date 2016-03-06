@@ -69,7 +69,7 @@ void handle_api() {
   if ( WebServer.hasArg("q") ) {
     query = WebServer.arg("q").toInt();
   } else {
-    handle_api_main();
+    handle_api_protocols();
     return;
   }
 
@@ -705,9 +705,9 @@ void handle_api_advanced() {
 //********************************************************************************
 // [get] handle_api_protocols
 //********************************************************************************
-void api_protocols() {
+void handle_api_protocols() {
 
-  String reply = F("[");
+  String reply = F("{\"Protocols\":[");
   String comma = F(",");
 
   for (byte x = 0; x <= protocolCount; x++)  {
@@ -726,14 +726,11 @@ void api_protocols() {
     reply = reply + comma + json_string(F("Password"   ), String(Protocol[x].usesPassword) );
     reply = reply + comma + json_string(F("defaultPort"), String(Protocol[x].defaultPort ) );
     reply = reply + F("}");
-    WebServer.sendContent(reply);
-    reply = "";
   }
 
-  reply = reply + F("]");
-  WebServer.sendContent(reply);
-
-} // api_protocols
+  reply = reply + F("]}");
+  WebServer.send(200, "application/json", reply );
+} // handle_api_protocols
 
 
 //********************************************************************************
@@ -779,21 +776,6 @@ void api_tasks() {
 
 
 //********************************************************************************
-// API [GET]
-// @return 3 x [json]
-//********************************************************************************
-void handle_api_main() {
-  WebServer.setContentLength(CONTENT_LENGTH_UNKNOWN);
-  WebServer.sendHeader("Connection", "close");
-  WebServer.send(200, "application/json", "");
-  WebServer.sendContent(F("{\"Protocols\":"));
-  api_protocols();
-  WebServer.sendContent(F(",\"Tasks\":"));
-  api_tasks();
-  WebServer.sendContent("}");
-}
-
-//********************************************************************************
 // main app
 //********************************************************************************
 void handle_app() {
@@ -828,8 +810,11 @@ void handle_dev_temp() {
 
       reply += F("{\"template\":\"<table class='table'><TH>Task Settings</TH><TH>Value</TH>");
 
-    //reply += F("<TR><TD>Device:<TD>");
-    //addDeviceSelect(reply, "taskdevicenumber", Settings.TaskDeviceNumber[index - 1]);
+    reply += F("<TR><TD>Device:<TD>");
+    String dev = "";
+    addDeviceSelect(dev, "taskdevicenumber", Settings.TaskDeviceNumber[index - 1]);
+    dev.replace("\"", "'");
+    reply += dev;
 
     if (Settings.TaskDeviceNumber[index - 1] != 0 )
     {
