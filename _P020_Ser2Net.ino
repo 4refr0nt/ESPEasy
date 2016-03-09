@@ -112,7 +112,8 @@ boolean Plugin_020(byte function, struct EventStruct *event, String& string)
           serialconfig += (ExtraTaskSettings.TaskDevicePluginConfigLong[2] - 5) << 2;
           if (ExtraTaskSettings.TaskDevicePluginConfigLong[4] == 2)
             serialconfig += 0x20;
-          Serial.begin(ExtraTaskSettings.TaskDevicePluginConfigLong[1], serialconfig);
+//          Serial.begin(ExtraTaskSettings.TaskDevicePluginConfigLong[1], serialconfig);
+          Serial.begin(ExtraTaskSettings.TaskDevicePluginConfigLong[1], SERIAL_8N1);
           ser2netServer = new WiFiServer(ExtraTaskSettings.TaskDevicePluginConfigLong[0]);
           ser2netServer->begin();
 
