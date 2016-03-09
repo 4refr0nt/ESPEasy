@@ -179,6 +179,8 @@
 #include <ArduinoJson.h>
 #include <LiquidCrystal_I2C.h>
 #include <Servo.h>
+#include "fd.h"
+
 #if FEATURE_SPIFFS
 #include <FS.h>
 #endif

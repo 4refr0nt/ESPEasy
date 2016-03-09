@@ -1,0 +1,326 @@
+void MQTTCheck();
+void MQTTConnect();
+void callback(const MQTT::Publish& pub);
+boolean checkSystemTimers();
+boolean setSystemCMDTimer(unsigned long timer, String& action);
+boolean setSystemTimer(unsigned long timer, byte plugin, byte Par1, byte Par2, byte Par3);
+void SensorSend();
+void SensorSendTask(byte TaskIndex);
+void backgroundtasks();
+void checkSensors();
+void loop();
+void run10TimesPerSecond();
+void runEach30Seconds();
+void runOncePerSecond();
+void setup();
+void hardwareInit();
+String parseTemplate(String &tmpString, byte lineSize);
+String timeLong2String(unsigned long lngTime);
+bool op_left_assoc(const char c);
+boolean LoadSettings();
+boolean ruleMatch(String& event, String& rule);
+boolean timeOut(unsigned long timer);
+byte getDeviceIndex(byte Number);
+byte getProtocolIndex(byte Number);
+float apply_operator(char op, float first, float second);
+float pop();
+float ul2float(unsigned long ul);
+int hour();
+int minute();
+int op_preced(const char c);
+int push(float value);
+int weekday();
+unsigned int op_arg_count(const char c);
+unsigned long FreeMem(void);
+unsigned long float2ul(float f);
+unsigned long getNtpTime();
+unsigned long now();
+unsigned long string2TimeLong(String &str);
+void BuildFixes();
+void CheckFlash(int start, int end);
+void EraseFlash();
+void LoadTaskSettings(byte TaskIndex);
+void ResetFactory(void);
+void SaveSettings(void);
+void SaveTaskSettings(byte TaskIndex);
+void ZeroFillFlash();
+void addLog(byte loglevel, String& string);
+void breakTime(unsigned long timeInput, struct timeStruct &tm);
+void checkTime();
+void delayMillis(unsigned long delay);
+void delayedReboot(int rebootDelay);
+void emergencyReset();
+void fileSystemCheck();
+void getIPfromHostName();
+void initTime();
+void rulesProcessing(String& event);
+void rulesTimers();
+void saveToRTC(byte Par1);
+void setTime(unsigned long t);
+void statusLED(boolean traffic);
+void taskClear(byte taskIndex, boolean save);
+bool SSDP_begin();
+void SSDP_schema(WiFiClient client);
+void SSDP_send(byte method);
+void SSDP_update();
+void SendUDPTaskData(byte destUnit, byte sourceTaskIndex, byte destTaskIndex);
+void SendUDPTaskInfo(byte destUnit, byte sourceTaskIndex, byte destTaskIndex);
+void checkUDP();
+void refreshNodeList();
+void sendSysInfoUDP(byte repeats);
+void serial();
+String json_array(  String name, String values) ;
+String json_number(  String name, String value);
+String json_number(  String name, int value);
+String json_string( String name, String value  );
+boolean isLoggedInApi();
+void Serial_var( String name, String var);
+void api_tasks();
+void handle_api();
+void handle_api_advanced();
+void handle_api_cmd();
+void handle_api_config();
+void handle_api_device();
+void handle_api_devices();
+void handle_api_hardware();
+void handle_api_i2c();
+void handle_api_log();
+void handle_api_options();
+void handle_api_protocols();
+void handle_api_root();
+void handle_app();
+void handle_dev_temp();
+void device_save();
+void save_advanced();
+void save_config();
+void save_hardware();
+bool loadFromSPIFFS(String path);
+boolean handle_json();
+boolean isLoggedIn();
+void WebServerInit();
+void addDeviceSelect(String& str, String name,  int choice);
+void addFooter(String& str);
+void addHeader(boolean showMenu, String& str);
+void addPinStateSelect(String& str, String name,  int choice);
+void addTaskSelect(String& str, String name,  int choice);
+void addTaskValueSelect(String& str, String name,  int choice, byte TaskIndex);
+void handleFileUpload();
+void handleNotFound();
+void handle_advanced();
+void handle_config();
+void handle_control();
+void handle_css();
+void handle_devices();
+void handle_download();
+void handle_filelist();
+void handle_hardware();
+void handle_i2cscanner();
+void handle_log();
+void handle_login();
+void handle_root();
+void handle_rules();
+void handle_setup();
+void handle_tools();
+void handle_upload();
+void handle_upload_post();
+void sortDeviceArray();
+
+void Plugin_003_pulse_interrupt1();
+void Plugin_003_pulse_interrupt2();
+void Plugin_003_pulse_interrupt3();
+void Plugin_003_pulse_interrupt4();
+void Plugin_003_pulse_interrupt5();
+void Plugin_003_pulse_interrupt6();
+void Plugin_003_pulse_interrupt7();
+void Plugin_003_pulse_interrupt8();
+void Plugin_003_pulsecheck(byte Index);
+void Plugin_003_pulseinit(byte Par1, byte Index);
+
+boolean Plugin_004(byte function, struct EventStruct *event, String& string);
+boolean Plugin_004_DS_readTemp(uint8_t ROM[8], float *value);
+byte Plugin_004_DS_scan(byte getDeviceROM, uint8_t* ROM);
+uint8_t Plugin_004_DS_crc8( uint8_t *addr, uint8_t len);
+uint8_t Plugin_004_DS_read(void);
+uint8_t Plugin_004_DS_read_bit(void);
+uint8_t Plugin_004_DS_reset();
+uint8_t Plugin_004_DS_search(uint8_t *newAddr);
+void Plugin_004_DS_reset_search();
+void Plugin_004_DS_write(uint8_t ByteToWrite);
+void Plugin_004_DS_write_bit(uint8_t v);
+
+boolean Plugin_005(byte function, struct EventStruct *event, String& string);
+int Plugin_005_read_dht_dat(void);
+
+boolean Plugin_006_bmp085_begin();
+boolean Plugin_006_bmp085_write8(uint8_t a, uint8_t d);
+float Plugin_006_bmp085_readTemperature(void);
+int32_t Plugin_006_bmp085_readPressure(void);
+uint16_t Plugin_006_bmp085_read16(uint8_t a);
+uint16_t Plugin_006_bmp085_readRawTemperature(void);
+uint32_t Plugin_006_bmp085_readRawPressure(void);
+uint8_t Plugin_006_bmp085_read8(uint8_t a);
+
+void Plugin_008_interrupt1();
+void Plugin_008_interrupt2();
+
+int Plugin_009_Read(byte Par1);
+boolean Plugin_009_Config(byte Par1, byte Par2);
+boolean Plugin_009_Write(byte Par1, byte Par2);
+
+boolean Plugin_011_Write(byte Par1, byte Par2);
+
+float Plugin_013_read();
+void Plugin_013_interrupt();
+
+boolean Plugin_014_si7021_begin(uint8_t resolution);
+int8_t Plugin_014_si7021_readValues(uint8_t resolution);
+int8_t Plugin_014_si7021_setResolution(uint8_t res);
+int8_t Plugin_014_si7021_startConv(uint8_t datatype, uint8_t resolution);
+uint8_t Plugin_014_si7021_checkCRC(uint16_t data, uint8_t check);
+
+boolean Plugin_015_tls2561_begin(uint8_t integration);
+int8_t Plugin_015_tsl2561_calcLux(uint8_t integration);
+uint8_t Plugin_015_tsl2561_writeRegister(uint8_t reg, uint8_t value);
+
+uint32_t getFirmwareVersion(void);
+
+boolean Plugin_019_Write(byte Par1, byte Par2);
+int Plugin_019_Read(byte Par1);
+
+boolean Plugin_022_Write(byte Par1, int Par2);
+void Plugin_022_writeRegister(int regAddress, byte data);
+
+int SpiffsSectors();
+void PluginInit();
+void CPluginInit();
+
+void WifiAPMode(boolean state);
+void WifiCheck();
+
+byte PluginCall(byte Function, struct EventStruct *event, String& str);
+byte CPluginCall(byte Function, struct EventStruct *event);
+
+boolean readFromRTC(byte* data);
+
+int Calculate(const char *input, float* result);
+boolean sendData(struct EventStruct *event);
+
+void ExecuteCommand(const char *Line);
+
+boolean GetArgv(const char *string, char *argv, int argc);
+
+boolean Plugin_017(byte function, struct EventStruct *event, String& string);
+boolean Plugin_017_Init(int8_t resetPin);
+byte Plugin_017_readPassiveTargetID(uint8_t cardbaudrate, uint8_t *uid, uint8_t *uidLength);
+int16_t Plugin_017_readResponse(uint8_t buf[], uint8_t len);
+int8_t Plugin_017_readAckFrame();
+int8_t Plugin_017_writeCommand(const uint8_t *header, uint8_t hlen);
+uint32_t getFirmwareVersion(void);
+
+
+boolean Plugin_020(byte function, struct EventStruct *event, String& string);
+
+boolean Plugin_023(byte function, struct EventStruct *event, String& string);
+static void Plugin_023_SendChar(unsigned char data);
+static void Plugin_023_clear_display(void);
+static void Plugin_023_init_OLED(void);
+static void Plugin_023_reset_display(void);
+static void Plugin_023_sendCharXY(unsigned char data, int X, int Y);
+static void Plugin_023_sendStr(unsigned char *string);
+static void Plugin_023_sendStrXY(const char *string, int X, int Y);
+static void Plugin_023_sendcommand(unsigned char com);
+static void Plugin_023_setXY(unsigned char row, unsigned char col);
+void Plugin_023_StartUp_OLED();
+void Plugin_023_displayOff(void);
+void Plugin_023_displayOn(void);
+
+
+float Plugin_027_getBusVoltage_V();
+float Plugin_027_getCurrent_mA();
+float Plugin_027_getShuntVoltage_mV();
+int16_t Plugin_027_getBusVoltage_raw();
+int16_t Plugin_027_getCurrent_raw();
+int16_t Plugin_027_getShuntVoltage_raw();
+void Plugin_027_begin(void);
+void Plugin_027_setCalibration_16V_400mA(void);
+void Plugin_027_setCalibration_32V_1A(void);
+void Plugin_027_setCalibration_32V_2A(void);
+void Plugin_027_wireWriteRegister (uint8_t reg, uint16_t value);
+
+
+bool Plugin_028_begin(uint8_t a);
+float Plugin_028_readAltitude(float seaLevel);
+float Plugin_028_readHumidity(void);
+float Plugin_028_readPressure(void);
+float Plugin_028_readTemperature(void);
+int16_t Plugin_028_readS16(byte reg);
+int16_t Plugin_028_readS16_LE(byte reg);
+uint16_t Plugin_028_read16(byte reg);
+uint16_t Plugin_028_read16_LE(byte reg);
+uint8_t Plugin_028_read8(byte reg);
+void Plugin_028_readCoefficients(void);
+void Plugin_028_write8(byte reg, byte value);
+
+String parseTemplate(String &tmpString, byte lineSize);
+String timeLong2String(unsigned long lngTime);
+bool op_left_assoc(const char c);
+boolean GetArgv(const char *string, char *argv, int argc);
+boolean LoadSettings();
+boolean readFromRTC(byte* data);
+boolean ruleMatch(String& event, String& rule);
+boolean str2ip(char *string, byte* IP);
+boolean timeOut(unsigned long timer);
+byte getDeviceIndex(byte Number);
+byte getProtocolIndex(byte Number);
+char *next_token(char *linep);
+float apply_operator(char op, float first, float second);
+float pop();
+float ul2float(unsigned long ul);
+int Calculate(const char *input, float* result);
+int RPNCalculate(char* token);
+int hour();
+int minute();
+int op_preced(const char c);
+int push(float value);
+int weekday();
+unsigned int op_arg_count(const char c);
+unsigned long FreeMem(void);
+unsigned long float2ul(float f);
+unsigned long getNtpTime();
+unsigned long now();
+unsigned long str2int(char *string);
+unsigned long string2TimeLong(String &str);
+void BuildFixes();
+void CheckFlash(int start, int end);
+void EraseFlash();
+void LoadCustomTaskSettings(int TaskIndex, byte* memAddress, int datasize);
+void LoadFromFile(char* fname, int index, byte* memAddress, int datasize);
+void LoadFromFlash(int index, byte* memAddress, int datasize);
+void LoadTaskSettings(byte TaskIndex);
+void ResetFactory(void);
+void SaveCustomTaskSettings(int TaskIndex, byte* memAddress, int datasize);
+void SaveSettings(void);
+void SaveTaskSettings(byte TaskIndex);
+void SaveToFile(char* fname, int index, byte* memAddress, int datasize);
+void SaveToFlash(int index, byte* memAddress, int datasize);
+void ZeroFillFlash();
+void addLog(byte loglevel, String& string);
+void addLog(byte loglevel, const char *line);
+void breakTime(unsigned long timeInput, struct timeStruct &tm);
+void checkTime();
+void delayMillis(unsigned long delay);
+void delayedReboot(int rebootDelay);
+void emergencyReset();
+void fileSystemCheck();
+void getIPfromHostName();
+void initTime();
+void parseCommandString(struct EventStruct *event, String& string);
+void rulesProcessing(String& event);
+void rulesTimers();
+void saveToRTC(byte Par1);
+void setTime(unsigned long t);
+void statusLED(boolean traffic);
+void taskClear(byte taskIndex, boolean save);
+
+
+void WifiAPconfig();
