@@ -321,6 +321,10 @@ void saveToRTC(byte Par1);
 void setTime(unsigned long t);
 void statusLED(boolean traffic);
 void taskClear(byte taskIndex, boolean save);
-
-
 void WifiAPconfig();
+void WifiConnect();
+void WifiAPMode(boolean state);
+boolean WifiDisconnect();
+void WifiScan();
+void WifiCheck();
+boolean Domoticz_getData(int idx, float *data);
