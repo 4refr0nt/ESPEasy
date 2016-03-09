@@ -327,4 +327,7 @@ void WifiAPMode(boolean state);
 boolean WifiDisconnect();
 void WifiScan();
 void WifiCheck();
+
+boolean CPlugin_001(byte function, struct EventStruct *event, String& string);
 boolean Domoticz_getData(int idx, float *data);
+
